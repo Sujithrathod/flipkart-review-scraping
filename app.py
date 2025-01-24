@@ -51,7 +51,7 @@ def reviews():
                 except:
                     comment = "no comment"
                 
-                mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead,
+                mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
                             "Comment": comment}
                 reviews.append(mydict)
             return render_template('result.html', reviews=reviews[0:(len(reviews)-1)])
