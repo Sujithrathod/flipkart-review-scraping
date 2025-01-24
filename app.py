@@ -27,6 +27,7 @@ def reviews():
             phone_page_bs = bs(phone_page,"html.parser")
             review_box = phone_page_bs.findAll("div",{"class":"col EPCmJX"})
             print(len(review_box))
+            product = phone_page_bs.findAll("div",{"class":"C7fEHH"})[0].div.text
             reviews = []
             
             for i in review_box:
@@ -52,7 +53,7 @@ def reviews():
                     comment = "no comment"
                 
                 mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
-                            "Comment": comment}
+                            "Comment": comment,"name":product}
                 reviews.append(mydict)
             return render_template('result.html', reviews=reviews[0:(len(reviews)-1)])
         except Exception as e:
