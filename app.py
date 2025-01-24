@@ -57,8 +57,9 @@ def reviews():
                     mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
                                 "Comment": comment}
                     reviews.append(mydict)
-                    reviews_with_index.append({"j": product, "reviews": reviews})
-                    print(reviews_with_index)
+                reviews_with_index.append({"j": product, "reviews": reviews})
+                review_box = []
+                print(reviews_with_index)
             return render_template('result.html', reviews_with_index=reviews_with_index)
         except Exception as e:
             print('The Exception message is: ',e)
