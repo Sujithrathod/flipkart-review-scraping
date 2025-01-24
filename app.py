@@ -13,7 +13,7 @@ def welcome():
 @app.route("/review",methods=["POST"])
 def reviews():
     if (request.method == "POST"):
-        # try:
+        try:
             content = request.form["input"].replace(" ","")
             iphone_url = "https://www.flipkart.com/search?q=" +content
             uclient = requests.get(iphone_url,"html.parser")
@@ -80,9 +80,9 @@ def reviews():
                 review_box = []
                 print(reviews_with_index)
             return render_template('result.html', reviews_with_index=reviews_with_index)
-        # except Exception as e:
-        #     print('The Exception message is: ',e)
-        #     return 'something is wrong'
+        except Exception as e:
+            print('The Exception message is: ',e)
+            return 'something is wrong'
     else:
         return render_template('index.html')
 
