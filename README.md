@@ -1,5 +1,5 @@
 # flipkart-scraping
-Usage ->
+How to use ->
     (terminal):
     pip install -r requirment.txt
 
