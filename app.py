@@ -19,43 +19,47 @@ def reviews():
             uclient = requests.get(iphone_url,"html.parser")
             flipkart_bs = bs(uclient.text,"html.parser")
             bigbox = flipkart_bs.findAll("div",{"class":"cPHDOP col-12-12"})
-            del bigbox[0:3]
-            last = bigbox[0].div.div.a["href"]
-            link = "https://www.flipkart.com"+last
-            productreq = requests.get(link)
-            phone_page = productreq.text
-            phone_page_bs = bs(phone_page,"html.parser")
-            review_box = phone_page_bs.findAll("div",{"class":"col EPCmJX"})
-            print(len(review_box))
-            product = phone_page_bs.findAll("div",{"class":"C7fEHH"})[0].div.text
-            reviews = []
+            del bigbox[0:2]
+            reviews_with_index = []
+            for j in range(2,len(bigbox)-3):
+                last = bigbox[j].div.div.a["href"]
+                link = "https://www.flipkart.com"+last
+                productreq = requests.get(link)
+                phone_page = productreq.text
+                phone_page_bs = bs(phone_page,"html.parser")
+                review_box = phone_page_bs.findAll("div",{"class":"col EPCmJX"})
+                print(len(review_box))
+                product = phone_page_bs.findAll("div",{"class":"C7fEHH"})[0].div.text
+                reviews = []
             
-            for i in review_box:
-                try:
-                    name = i.findAll("div",{"class":"row gHqwa8"})[0].div.p.text
-                except:
-                    name = "no name"
+                for i in review_box:
+                    try:
+                        name = i.findAll("div",{"class":"row gHqwa8"})[0].div.p.text
+                    except:
+                        name = "no name"
+                        
+                    try:
+                        rating = i.div.div.text
+                    except:
+                        rating = "Np rating"
+                        
+                    try:
+                        commentHead = i.div.text
+                    except:
+                        commentHead = "no comment head"
                     
-                try:
-                    rating = i.div.div.text
-                except:
-                    rating = "Np rating"
+                    try:
+                        ch =i.findAll("div",{"class":"row"})
+                        comment = ch[1].div.div.div.text
+                    except:
+                        comment = "no comment"
                     
-                try:
-                    commentHead = i.div.text
-                except:
-                    commentHead = "no comment head"
-                
-                try:
-                    ch =i.findAll("div",{"class":"row"})
-                    comment = ch[1].div.div.div.text
-                except:
-                    comment = "no comment"
-                
-                mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
-                            "Comment": comment,"name":product}
-                reviews.append(mydict)
-            return render_template('result.html', reviews=reviews[0:(len(reviews)-1)])
+                    mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
+                                "Comment": comment}
+                    reviews.append(mydict)
+                    reviews_with_index.append({"j": product, "reviews": reviews})
+                    print(reviews_with_index)
+            return render_template('result.html', reviews_with_index=reviews_with_index)
         except Exception as e:
             print('The Exception message is: ',e)
             return 'something is wrong'
