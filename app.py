@@ -13,23 +13,39 @@ def welcome():
 @app.route("/review",methods=["POST"])
 def reviews():
     if (request.method == "POST"):
-        try:
+        # try:
             content = request.form["input"].replace(" ","")
             iphone_url = "https://www.flipkart.com/search?q=" +content
             uclient = requests.get(iphone_url,"html.parser")
             flipkart_bs = bs(uclient.text,"html.parser")
             bigbox = flipkart_bs.findAll("div",{"class":"cPHDOP col-12-12"})
-            del bigbox[0:2]
+            if (len(bigbox) > 2):
+                del bigbox[0:2]
+            if not bigbox:
+                return "No products found."
             reviews_with_index = []
-            for j in range(2,len(bigbox)-3):
-                last = bigbox[j].div.div.a["href"]
+            for j in range(0,len(bigbox)):
+                try:
+        # Validate structure before accessing
+                    if bigbox[j].div and bigbox[j].div.div and bigbox[j].div.div.a:
+                        last = bigbox[j].div.div.a["href"]
+                    else:
+                        print(f"Skipping item at index {j}: Structure does not match.")
+                        continue
+                except AttributeError as e:
+                    print(f"AttributeError at index {j}: {e}")
+                    continue
                 link = "https://www.flipkart.com"+last
                 productreq = requests.get(link)
                 phone_page = productreq.text
                 phone_page_bs = bs(phone_page,"html.parser")
                 review_box = phone_page_bs.findAll("div",{"class":"col EPCmJX"})
                 print(len(review_box))
-                product = phone_page_bs.findAll("div",{"class":"C7fEHH"})[0].div.text
+                product_list = phone_page_bs.findAll("div",{"class":"C7fEHH"})
+                if product_list:
+                    product = product_list[0].div.text
+                else:
+                    product = "Unknown product"
                 reviews = []
             
                 for i in review_box:
@@ -56,14 +72,17 @@ def reviews():
                     
                     mydict = {"Product": content, "Name": name, "Rating": rating, "CommentHead": commentHead[1:],
                                 "Comment": comment}
+                    if mydict["Name"] == "" or mydict["Rating"] == "" or mydict["Comment"] == "":
+                        continue
                     reviews.append(mydict)
+                print(reviews)
                 reviews_with_index.append({"j": product, "reviews": reviews})
                 review_box = []
                 print(reviews_with_index)
             return render_template('result.html', reviews_with_index=reviews_with_index)
-        except Exception as e:
-            print('The Exception message is: ',e)
-            return 'something is wrong'
+        # except Exception as e:
+        #     print('The Exception message is: ',e)
+        #     return 'something is wrong'
     else:
         return render_template('index.html')
 
